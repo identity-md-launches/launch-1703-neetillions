@@ -3,6 +3,78 @@
 A fixed-supply ERC-20 memecoin celebrating $NEET. The entire supply is minted once
 to the immediate deployer in the constructor.
 
+
+## Website
+
+The dark, responsive $NEETHOME website is in `web/`, with its finished static export in `dist/`. It preserves the deployed token. No contract was deployed, replaced or modified for the site.
+
+### Install, develop, preview and rebuild
+
+Use Node.js 22.12+ (validated on Node 24.21.0) and npm. From the repository root:
+
+```sh
+npm --prefix web ci
+npm --prefix web run dev
+```
+
+To regenerate and preview the production export:
+
+```sh
+npm --prefix web run typecheck
+npm --prefix web run build
+npm --prefix web run preview -- --port 4173
+```
+
+Vite writes **`dist/` at the repository root**. Its base is `./`; scripts, CSS, font, favicon, wallet marks and the share image use relative paths. The production page was also checked under `/preview/`. Serve the entire `dist/` directory through HTTP(S); opening `index.html` as a `file:` URL does not support module loading. No backend, environment variables, private keys, relay or WalletConnect project ID is needed.
+
+A build checks the derived Neetillions ABI against the deployment’s canonical Keccak hash before typechecking and bundling. Public deployment facts are preserved in `web/src/deployment.json`, so the build does not depend on the temporary `.imd/reads/` inputs. The exact source ABI is in `web/src/Neetillions.abi.json`. Contract build configuration and Solidity dependencies are unchanged.
+
+### What the website reads and does
+
+- **$NEETHOME / Robinhood Chain (4663):** `0x66d0963f8a9af27b15028d84DA8A1792999A840f`.
+- **$NEET / Solana:** `Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump`.
+- Prices refresh every **30 seconds** in a visible tab, with a manual refresh and visible source/fetch time. DEX Screener pairs are filtered by exact token and chain, then ranked by liquidity. An absent market cap is never replaced by FDV.
+- $NEETHOME first tries an indexed DEX Screener quote and Blockscout’s token data. Its fallback reads the pinned Uniswap v4 pool’s current `sqrtPriceX96`, liquidity and total supply from Robinhood Chain, then converts IMD into USD using IMD’s matching DEX Screener quote. Since both currencies have 18 decimals, `NEETHOME/USD = IMD/USD / (sqrtPriceX96 / 2^96)^2`. The supply-based cap is explicitly estimated. A pool without active liquidity shows a **reference** price rather than claiming a traded quote.
+- Fees refresh every **60 seconds**. The reader verifies chain, successful launch receipt and matching `Initialize` event, then requests every `Swap` log from block **88157730** through head minus 12 blocks. It splits rejected/large ranges, rejects duplicate or malformed logs and never publishes a partial history. Each negative input delta is multiplied by the event’s fee / 1,000,000. Fees in IMD and NEETHOME are marked to current USD prices. Nonzero totals are labeled estimates because swap-step rounding can differ and this is current valuation, not historic USD revenue. Gas, donations, other pools and payouts are excluded. A 45-second / 64-range budget bounds a scan; larger or unavailable histories display an error and retry. A public indexer would be needed if future history exceeds these limits.
+- Buy/Sell links open **Uniswap** on Robinhood Chain with the verified IMD/NEETHOME direction selected in the URL. The site itself sends no approvals or swaps. Uniswap supplies the executable quote and asks for its own wallet connection; execution depends on its service and available liquidity.
+- Wallet support: EIP-6963 named browser providers, mobile links for MetaMask/Coinbase/Rabby/Phantom, and Coinbase Smart Wallet, behind one connect control. Connected users can read their balance, switch/add the pinned chain, add the token to their wallet, and disconnect. Connection does not sign a transaction. Wallet reconnect uses wagmi’s local connection storage.
+- The **50% buy $NEET / 40% burn / 10% dev** split is shown as the requested intended policy. The deployed fixed-supply token has no transfer tax, automatic fee distributor or burn entrypoint. The site does not claim that buybacks, burns or dev payouts have occurred.
+
+During the live browser check on 2026-10-14, both USD displays loaded, the launch pool had zero active liquidity at its current tick, and the full-history query found **0 swaps**, yielding a measured **$0.00** in swap fees. These values are fetched at runtime, not seeded into the export. Failed refreshes retain the last known value with a stale label; first-load failures show unavailable states, never invented prices or zeros.
+
+### Validation
+
+```sh
+npm --prefix web run typecheck
+npm --prefix web run build
+npm --prefix web test
+# Install these browsers on a development machine if absent:
+(cd web && npx playwright install chromium webkit)
+npm --prefix web run test:browser
+```
+
+`web/tests/browser.mjs` serves the actual export at a gateway-like subpath, uses explicit API and EIP-6963 fixtures, and checks primary interactions in Chromium and WebKit without signing or sending transactions. It writes temporary evidence only to `test/scratch/interaction/`. The unit suite checks token/chain filtering, unavailable data, reference-price math, fee decoding, duplicate/reorg rejection and mobile URL encoding.
+
+The final production build and typecheck passed, all 10 unit tests passed, and all 22 browser interaction groups passed across Chromium and WebKit. The pinned design probe passed 15 of 16 raw checks; its one header-wallet false positive is documented. Actual results and remaining limitations are recorded in [`VALIDATION.md`](VALIDATION.md). The implemented design, responsive rules and six-domain review are documented in [`DESIGN.md`](DESIGN.md) and the validation record. These are worker-side checks, not an independent certification.
+
+The local font, favicon, original house illustration, wallet marks and 1200×630 PNG share card are included. To regenerate the share card from its local HTML source, run `npm --prefix web run share`, then rebuild. Its generator uses Playwright Chromium. Licenses and attribution are retained under `web/licenses/`.
+
+### Delivery size and dependencies
+
+Deliver the source, `web/package.json`, `web/package-lock.json`, documentation and **all of `dist/`**. Do not submit `web/node_modules/`, browser downloads, npm caches, test scratch output or package archives. Dependencies installed for checks are removed from this delivery; use `npm ci` to restore them. No ignore files or existing build/dependency files were changed. The submission is checked against the 8 MiB limit in the validation record.
+
+### Reference sources
+
+- [DEX Screener API](https://docs.dexscreener.com/api/reference): token-pair quotes and liquidity/market-cap fields.
+- [Uniswap v4 PoolManager interface](https://github.com/Uniswap/v4-core/blob/main/src/interfaces/IPoolManager.sol): pool initialization and swap event definitions.
+- [Uniswap chain metadata](https://github.com/Uniswap/interface/blob/main/packages/chains/src/chainMetadata/chainMetadata.ts): the Robinhood URL slug.
+- [Robinhood Chain support](https://robinhood.com/us/en/support/articles/robinhood-chain-mainnet/): public chain information, consistent with the supplied network facts.
+- [Rabby mobile universal-link handler](https://github.com/RabbyHub/rabby-mobile/blob/develop/apps/mobile/src/hooks/universalLink.ts): `_cmd=open-dapp&dapp=`. The other wallet URLs follow the pinned connector reference.
+
+---
+
+The original contract documentation follows.
+
 ## Contract and behavior
 
 | Parameter | Value |

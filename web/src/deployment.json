@@ -1,0 +1,101 @@
+{
+  "deployment": {
+    "version": 1,
+    "launchId": "06534dbc-d1f8-409e-9db3-a6b42b68bff6",
+    "chainId": 4663,
+    "repoUrl": "https://github.com/identity-md-launches/launch-1703-neetillions",
+    "sourceCommit": "f58a01bee0385b21494d12eed32421b257709e85",
+    "attestationHash": "595f42b3de4e9d0b081c5545d53365d5b8c6ee506483f99ba89368b8103ac01c",
+    "manifest": {
+      "kind": "custom_token",
+      "token": {
+        "contract": "Neetillions",
+        "name": "neetillions",
+        "symbol": "NEETHOME",
+        "decimals": 18,
+        "constructorArgs": [],
+        "totalSupply": "1000000000000000000000000000"
+      },
+      "contracts": [],
+      "pool": {
+        "pairedCurrency": "0x5f7bb59365ce557c26dbcaa4ee9d39a4b95b7127",
+        "fee": 12500,
+        "tickSpacing": 60,
+        "initialPrice": "79228162514264337593543950336"
+      },
+      "economics": {
+        "poolBps": 8800,
+        "initialMarketCapWei": "2500000000000000000000",
+        "remainderTo": "0x82c3817faf5f8376aa163fcf1f0eb1e40f4e0245"
+      },
+      "notes": "Neetillions is a fixed-supply ERC-20 celebrating $NEET. Its no-argument constructor mints all 1,000,000,000 neetillions (NEETHOME), with 18 decimals, once to msg.sender, the factory during launch. It has no external mint or burn functions, transfer fees, or administrative powers. No application contracts are deployed. The pool pairs with IMD at a 1.25% fee. pool.initialPrice records provenance only; the deployer derives the opening price from economics.initialMarketCapWei and totalSupply."
+    },
+    "contracts": [
+      {
+        "name": "Neetillions",
+        "address": "0x66d0963f8a9af27b15028d84da8a1792999a840f",
+        "txHash": "0x0a3114644519ab11ec4764511959ce01a5cd957a30f9899cf035f3686bf5c3bf",
+        "blockNumber": 88157730,
+        "creationCodeHash": "26a58976b18f1fc62a13293dfa2ffa6a8758d74d134d472e244fb45dcd326277",
+        "abiHash": "b48adcbf1a0e9b355d85120282552da2aa95ef6406529af056dbad779f13dccb"
+      }
+    ],
+    "poolKey": {
+      "currency0": "0x5f7bb59365ce557c26dbcaa4ee9d39a4b95b7127",
+      "currency1": "0x66d0963f8a9af27b15028d84da8a1792999a840f",
+      "fee": 12500,
+      "tickSpacing": 60,
+      "hooks": "0x19bec7c2e1b2aadaf67b259744751a9960d66000"
+    },
+    "abiInstructions": "Build ABIs from this exact source commit; compare canonicalKeccak(abi) with abiHash. Verify deployed code on the stated chain before enabling transactions."
+  },
+  "network": {
+    "network": {
+      "chainId": 4663,
+      "name": "Robinhood Chain",
+      "testnet": false,
+      "rpcUrls": [
+        "https://robinhood-rpc.publicnode.com",
+        "https://rpc.mainnet.chain.robinhood.com"
+      ],
+      "explorer": "https://robin.etherscan.io",
+      "nativeCurrency": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "faucets": [],
+      "uniswapV4": {
+        "poolManager": "0x8366a39cc670b4001a1121b8f6a443a643e40951",
+        "universalRouter": "0x8876789976decbfcbbbe364623c63652db8c0904",
+        "quoter": "0x8dc178efb8111bb0973dd9d722ebeff267c98f94",
+        "stateView": "0xf3334192d15450cdd385c8b70e03f9a6bd9e673b",
+        "positionManager": "0x58daec3116aae6d93017baaea7749052e8a04fa7",
+        "permit2": "0x000000000022d473030f116ddee9f6b43ac78ba3",
+        "extendedSwapParams": true
+      },
+      "pairToken": {
+        "address": "0x5f7bb59365ce557c26dbcaa4ee9d39a4b95b7127",
+        "symbol": "IMD",
+        "name": "Identity.md",
+        "decimals": 18
+      }
+    },
+    "walletAddChain": {
+      "chainId": "0x1237",
+      "chainName": "Robinhood Chain",
+      "rpcUrls": [
+        "https://robinhood-rpc.publicnode.com",
+        "https://rpc.mainnet.chain.robinhood.com"
+      ],
+      "nativeCurrency": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "blockExplorerUrls": [
+        "https://robin.etherscan.io"
+      ]
+    }
+  }
+}
